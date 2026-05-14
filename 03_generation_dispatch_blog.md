@@ -9,12 +9,12 @@ Generation dispatch optimization isn't just about turning generators on and offâ
 Every hour, power generators must decide which units to run and at what output levels. These decisions directly impact profitability through fuel costs, emissions compliance costs, and market price exposure. A 1% improvement in dispatch efficiency translates to millions of dollars annually for large utilities.
 
 The dispatch optimization challenge involves:
-- **Economic Dispatch**: Minimize total fuel costs across the generation fleet
-- **Unit Commitment**: Decide which generators to start, run, and stop
-- **Reserve Requirements**: Maintain sufficient backup capacity for contingencies
-- **Transmission Constraints**: Respect grid limitations on power flows
-- **Environmental Compliance**: Meet emissions limits and renewable targets
-- **Ramping Capabilities**: Match generation to load changes throughout the day
+- Economic Dispatch: Minimize total fuel costs across the generation fleet
+- Unit Commitment: Decide which generators to start, run, and stop
+- Reserve Requirements: Maintain sufficient backup capacity for contingencies
+- Transmission Constraints: Respect grid limitations on power flows
+- Environmental Compliance: Meet emissions limits and renewable targets
+- Ramping Capabilities: Match generation to load changes throughout the day
 
 ![Generation Dispatch](03_generation_dispatch_main.png)
 
@@ -52,15 +52,15 @@ Environmental regulations add complexity to dispatch. Emissions constraints forc
 
 Optimal generation dispatch requires balancing multiple competing objectives:
 
-**1. Merit Order Is the Foundation**: Always dispatch from lowest to highest marginal cost, but real optimization requires considering constraints.
+1. Merit Order Is the Foundation: Always dispatch from lowest to highest marginal cost, but real optimization requires considering constraints.
 
-**2. Start/Stop Costs Matter**: Avoiding frequent unit cycling often justifies running less efficient units during low-demand periods.
+2. Start/Stop Costs Matter: Avoiding frequent unit cycling often justifies running less efficient units during low-demand periods.
 
-**3. Renewable Integration Requires Reserves**: Forecast uncertainty demands maintaining conventional capacity on standby, adding costs that offset renewable savings.
+3. Renewable Integration Requires Reserves: Forecast uncertainty demands maintaining conventional capacity on standby, adding costs that offset renewable savings.
 
-**4. Emissions Constraints Change Economics**: Carbon prices or caps alter the merit order, favoring cleaner units despite higher fuel costs.
+4. Emissions Constraints Change Economics: Carbon prices or caps alter the merit order, favoring cleaner units despite higher fuel costs.
 
-**5. Real-Time Optimization Is Dynamic**: Actual dispatch must continuously adapt to demand changes, generator outages, and renewable forecast errors.
+5. Real-Time Optimization Is Dynamic: Actual dispatch must continuously adapt to demand changes, generator outages, and renewable forecast errors.
 
 The code examples demonstrate dispatch algorithms. Implement merit order dispatch first, add unit commitment logic, incorporate renewable forecasting, and finally overlay emissions constraints for comprehensive optimization.
 
@@ -68,13 +68,13 @@ The code examples demonstrate dispatch algorithms. Implement merit order dispatc
 
 Deploy advanced dispatch optimization systematically:
 
-1. **Data Collection**: Gather generator specifications, fuel costs, and emissions rates
-2. **Merit Order Implementation**: Deploy basic economic dispatch algorithm
-3. **Unit Commitment**: Add start/stop cost optimization
-4. **Renewable Integration**: Incorporate wind and solar forecasts with uncertainty
-5. **Emissions Tracking**: Implement real-time emissions monitoring and compliance
-6. **Reserve Optimization**: Calculate and maintain appropriate reserve margins
-7. **Performance Measurement**: Track actual vs. forecasted costs and emissions
+1. Data Collection: Gather generator specifications, fuel costs, and emissions rates
+2. Merit Order Implementation: Deploy basic economic dispatch algorithm
+3. Unit Commitment: Add start/stop cost optimization
+4. Renewable Integration: Incorporate wind and solar forecasts with uncertainty
+5. Emissions Tracking: Implement real-time emissions monitoring and compliance
+6. Reserve Optimization: Calculate and maintain appropriate reserve margins
+7. Performance Measurement: Track actual vs. forecasted costs and emissions
 
 Professional dispatch optimization reduces fuel costs 5-15% compared to manual methods while improving reliability and environmental complianceâ€”gains that compound to millions of dollars annually for large generation portfolios.
 
