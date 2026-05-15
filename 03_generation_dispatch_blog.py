@@ -5,7 +5,6 @@ This code was automatically extracted from the markdown file.
 You may need to adjust imports and add necessary dependencies.
 """
 import numpy as np
-from datetime import datetime, timedelta
 import logging
 import sys
 logging.basicConfig(level=logging.INFO, format='%(levelname)s %(name)s: %(message)s', stream=sys.stderr, force=True)
@@ -61,7 +60,7 @@ def calculate_merit_order_dispatch(demand_mw, generation_sources, hour):
             total_cost += cost
             total_emissions += emissions
     marginal_price = max([d['cost'] / d['output_mw'] for d in dispatch_schedule]) if dispatch_schedule else 0
-    return {'dispatch': dispatch_schedule, 'total_demand_met': demand_mw - remaining_demand, 'total_cost': total_cost, 'total_emissions_tons': total_emissions, 'marginal_price_mwh': marginal_price, 'renewable_percentage': sum((d['output_mw'] for d in dispatch_schedule if d['source'] in ['wind', 'solar'])) / (demand_mw - remaining_demand) * 100 if remaining_demand < demand_mw else 0}
+    return {'dispatch': dispatch_schedule, 'total_demand_met': demand_mw - remaining_demand, 'total_cost': total_cost, 'total_emissions_tons': total_emissions, 'marginal_price_mwh': marginal_price, 'renewable_percentage': sum(d['output_mw'] for d in dispatch_schedule if d['source'] in ['wind', 'solar']) / (demand_mw - remaining_demand) * 100 if remaining_demand < demand_mw else 0}
 sources = define_generation_sources()
 demand = 1800
 hour = 14
@@ -82,7 +81,7 @@ def optimize_unit_commitment(demand_profile_24h, generation_sources):
     Considers startup costs, minimum run times, and ramping constraints
     to minimize total production cost.
     """
-    unit_states = {name: {'online': False, 'hours_online': 0, 'hours_offline': 24} for name in generation_sources.keys()}
+    unit_states = {name: {'online': False, 'hours_online': 0, 'hours_offline': 24} for name in generation_sources}
     commitment_schedule = []
     total_cost = 0
     for hour, demand_mw in enumerate(demand_profile_24h):
@@ -124,13 +123,13 @@ def optimize_unit_commitment(demand_profile_24h, generation_sources):
     return {'schedule': commitment_schedule, 'total_24h_cost': total_cost, 'avg_hourly_cost': total_cost / 24}
 demand_profile = []
 for hour in range(24):
-    base_demand = np.select([6 <= hour <= 9, 17 <= hour <= 21, 22 <= hour or hour <= 5], [1850, 2100, 1400], default=1650)
+    base_demand = np.select([6 <= hour <= 9, 17 <= hour <= 21, hour >= 22 or hour <= 5], [1850, 2100, 1400], default=1650)
     demand_profile.append(base_demand + np.random.randint(-50, 50))
 commitment = optimize_unit_commitment(demand_profile, sources)
-logger.info(f'\n24-Hour Unit Commitment Optimization:')
+logger.info('\n24-Hour Unit Commitment Optimization:')
 logger.info(f"  Total Daily Cost: ${commitment['total_24h_cost']:,.2f}")
 logger.info(f"  Average Hourly Cost: ${commitment['avg_hourly_cost']:,.2f}")
-logger.info(f'\nPeak Hour (19:00) Dispatch:')
+logger.info('\nPeak Hour (19:00) Dispatch:')
 peak_hour = commitment['schedule'][19]
 logger.info(f"  Demand: {peak_hour['demand']} MW")
 logger.info(f"  Units Online: {len(peak_hour['units_online'])}")
@@ -182,7 +181,7 @@ def dispatch_with_emissions_constraint(demand_profile_24h, generation_sources, d
     for hour, demand_mw in enumerate(demand_profile_24h):
         hours_remaining = 24 - hour
         emissions_budget = daily_emissions_limit_tons - cumulative_emissions
-        emissions_budget_per_hour = emissions_budget / hours_remaining if hours_remaining > 0 else 0
+        emissions_budget / hours_remaining if hours_remaining > 0 else 0
         emissions_penalty = 50
         available_sources = {}
         for name, specs in generation_sources.items():
@@ -236,9 +235,9 @@ if dispatch_mw < gen['min_output_mw'] and dispatch_mw > 0:
     total_cost += cost
     total_emissions += emissions
 marginal_price = max([d['cost'] / d['output_mw'] for d in dispatch_schedule]) if dispatch_schedule else 0
-return {'dispatch': dispatch_schedule, 'total_demand_met': demand_mw - remaining_demand, 'total_cost': total_cost, 'total_emissions_tons': total_emissions, 'marginal_price_mwh': marginal_price, 'renewable_percentage': sum((d['output_mw'] for d in dispatch_schedule if d['source'] in ['wind', 'solar'])) / (demand_mw - remaining_demand) * 100 if remaining_demand < demand_mw else 0}
+return {'dispatch': dispatch_schedule, 'total_demand_met': demand_mw - remaining_demand, 'total_cost': total_cost, 'total_emissions_tons': total_emissions, 'marginal_price_mwh': marginal_price, 'renewable_percentage': sum(d['output_mw'] for d in dispatch_schedule if d['source'] in ['wind', 'solar']) / (demand_mw - remaining_demand) * 100 if remaining_demand < demand_mw else 0}
 logger.info(f"  {unit['source']}: {unit['output_mw']:.0f} MW")
-unit_states = {name: {'online': False, 'hours_online': 0, 'hours_offline': 24} for name in generation_sources.keys()}
+unit_states = {name: {'online': False, 'hours_online': 0, 'hours_offline': 24} for name in generation_sources}
 commitment_schedule = []
 total_cost = 0
 for hour, demand_mw in enumerate(demand_profile_24h):
@@ -259,7 +258,7 @@ hour_dispatch['hour_cost'] += specs['startup_cost']
 hour_dispatch['hour_cost'] += specs['shutdown_cost']
 online_sources = {name: specs for name, specs in generation_sources.items() if unit_states[name]['online'] or specs.get('variability', False)}
 return {'schedule': commitment_schedule, 'total_24h_cost': total_cost, 'avg_hourly_cost': total_cost / 24}
-base_demand = np.select([6 <= hour <= 9, 17 <= hour <= 21, 22 <= hour or hour <= 5], [1850, 2100, 1400], default=1650)
+base_demand = np.select([6 <= hour <= 9, 17 <= hour <= 21, hour >= 22 or hour <= 5], [1850, 2100, 1400], default=1650)
 demand_profile.append(base_demand + np.random.randint(-50, 50))
 logger.info(f"    {unit['source']}: {unit['output_mw']:.0f} MW at ${unit['cost']:,.0f}")
 wind_actual = wind_forecast_mw * (1 + np.random.uniform(-0.15, 0.15))
