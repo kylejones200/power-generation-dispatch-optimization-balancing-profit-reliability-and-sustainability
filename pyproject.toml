@@ -1,0 +1,19 @@
+[project]
+name = "power-generation-dispatch-optimization-balancing-profit-reliability-and-sustaina"
+version = "0.1.0"
+description = "Companion code for Medium article: power generation dispatch optimization balancing profit reliability and sustainability"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.4.4",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
