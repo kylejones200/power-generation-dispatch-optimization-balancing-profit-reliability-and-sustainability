@@ -257,7 +257,7 @@ def optimize_unit_commitment(demand_profile_24h, generation_sources):
         hour_dispatch["generation"] = dispatch["dispatch"]
         hour_dispatch["hour_cost"] += dispatch["total_cost"]
         total_cost += dispatch["total_cost"]
-        pd.concat([commitment_schedule, hour_dispatch])
+        commitment_schedule.append(hour_dispatch)
     return {
         "schedule": commitment_schedule,
         "total_24h_cost": total_cost,
