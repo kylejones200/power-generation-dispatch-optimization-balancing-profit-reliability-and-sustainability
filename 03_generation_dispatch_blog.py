@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 def define_generation_sources():
     """
     Define characteristics of different generation sources.
-
     Each source has unique cost structures, capabilities, and constraints
     that determine optimal dispatch decisions.
     """
@@ -102,7 +101,6 @@ for name, specs in sources.items():
 def calculate_merit_order_dispatch(demand_mw, generation_sources, hour):
     """
     Calculate optimal economic dispatch using merit order.
-
     Dispatches generators from lowest to highest marginal cost
     until total demand is satisfied.
     """
@@ -114,9 +112,7 @@ def calculate_merit_order_dispatch(demand_mw, generation_sources, hour):
                 specs["capacity_mw"] * (0.1 + 0.9 * np.sin((hour - 6) * np.pi / 12)),
                 0,
             )
-        capacity = np.where(
-            source_name == "wind", specs["capacity_mw"] * 0.7, specs["capacity_mw"]
-        )
+        capacity = np.where(source_name == "wind", specs["capacity_mw"] * 0.7, specs["capacity_mw"])
         if capacity > 0:
             available_gen.append(
                 {
@@ -153,9 +149,7 @@ def calculate_merit_order_dispatch(demand_mw, generation_sources, hour):
             total_cost += cost
             total_emissions += emissions
     marginal_price = (
-        max([d["cost"] / d["output_mw"] for d in dispatch_schedule])
-        if dispatch_schedule
-        else 0
+        max([d["cost"] / d["output_mw"] for d in dispatch_schedule]) if dispatch_schedule else 0
     )
     return {
         "dispatch": dispatch_schedule,
@@ -164,9 +158,7 @@ def calculate_merit_order_dispatch(demand_mw, generation_sources, hour):
         "total_emissions_tons": total_emissions,
         "marginal_price_mwh": marginal_price,
         "renewable_percentage": sum(
-            d["output_mw"]
-            for d in dispatch_schedule
-            if d["source"] in ["wind", "solar"]
+            d["output_mw"] for d in dispatch_schedule if d["source"] in ["wind", "solar"]
         )
         / (demand_mw - remaining_demand)
         * 100
@@ -181,9 +173,7 @@ hour = 14
 dispatch_result = calculate_merit_order_dispatch(demand, sources, hour)
 logger.info(f"\nEconomic Dispatch for {demand} MW demand at hour {hour}:")
 logger.info(f"  Total Cost: ${dispatch_result['total_cost']:,.2f}")
-logger.info(
-    f"  Total Emissions: {dispatch_result['total_emissions_tons']:.1f} tons CO2"
-)
+logger.info(f"  Total Emissions: {dispatch_result['total_emissions_tons']:.1f} tons CO2")
 logger.info(f"  Marginal Price: ${dispatch_result['marginal_price_mwh']:.2f}/MWh")
 logger.info(f"  Renewable %: {dispatch_result['renewable_percentage']:.1f}%")
 logger.info("\nDispatch by Source:")
@@ -194,7 +184,6 @@ for unit in dispatch_result["dispatch"]:
 def optimize_unit_commitment(demand_profile_24h, generation_sources):
     """
     Optimize which units to commit over 24-hour period.
-
     Considers startup costs, minimum run times, and ramping constraints
     to minimize total production cost.
     """
@@ -282,9 +271,7 @@ peak_hour = commitment["schedule"][19]
 logger.info(f"  Demand: {peak_hour['demand']} MW")
 logger.info(f"  Units Online: {len(peak_hour['units_online'])}")
 for unit in peak_hour["generation"]:
-    logger.info(
-        f"    {unit['source']}: {unit['output_mw']:.0f} MW at ${unit['cost']:,.0f}"
-    )
+    logger.info(f"    {unit['source']}: {unit['output_mw']:.0f} MW at ${unit['cost']:,.0f}")
 
 
 def dispatch_with_renewable_uncertainty(
@@ -292,7 +279,6 @@ def dispatch_with_renewable_uncertainty(
 ):
     """
     Dispatch considering renewable forecast uncertainty.
-
     Maintains reserve margins to handle renewable forecast errors
     while maximizing renewable utilization.
     """
@@ -307,9 +293,7 @@ def dispatch_with_renewable_uncertainty(
     conventional_sources = {
         k: v for k, v in generation_sources.items() if k not in ["wind", "solar"]
     }
-    dispatch = calculate_merit_order_dispatch(
-        total_conventional_needed, conventional_sources, hour
-    )
+    dispatch = calculate_merit_order_dispatch(total_conventional_needed, conventional_sources, hour)
     actual_cost = renewable_generation * 0 + conventional_demand * (
         dispatch["total_cost"] / total_conventional_needed
     )
@@ -323,14 +307,10 @@ def dispatch_with_renewable_uncertainty(
         "reserve_mw": reserve_margin,
         "actual_cost": actual_cost,
         "emissions_saved_tons": emissions_saved,
-        "wind_forecast_error_pct": (wind_actual - wind_forecast_mw)
-        / wind_forecast_mw
-        * 100
+        "wind_forecast_error_pct": (wind_actual - wind_forecast_mw) / wind_forecast_mw * 100
         if wind_forecast_mw > 0
         else 0,
-        "solar_forecast_error_pct": (solar_actual - solar_forecast_mw)
-        / solar_forecast_mw
-        * 100
+        "solar_forecast_error_pct": (solar_actual - solar_forecast_mw) / solar_forecast_mw * 100
         if solar_forecast_mw > 0
         else 0,
     }
@@ -361,7 +341,6 @@ def dispatch_with_emissions_constraint(
 ):
     """
     Optimize dispatch subject to daily emissions constraint.
-
     Balances cost minimization with emissions compliance,
     potentially dispatching higher-cost, lower-emission units.
     """
@@ -377,18 +356,12 @@ def dispatch_with_emissions_constraint(
         for name, specs in generation_sources.items():
             modified_specs = specs.copy()
             modified_specs["variable_cost_mwh"] = (
-                specs["variable_cost_mwh"]
-                + specs["emissions_co2_ton_mwh"] * emissions_penalty
+                specs["variable_cost_mwh"] + specs["emissions_co2_ton_mwh"] * emissions_penalty
             )
             available_sources[name] = modified_specs
         dispatch = calculate_merit_order_dispatch(demand_mw, available_sources, hour)
-        if (
-            cumulative_emissions + dispatch["total_emissions_tons"]
-            > daily_emissions_limit_tons
-        ):
-            logger.info(
-                f"  Hour {hour}: Emissions constraint binding, adjusting dispatch"
-            )
+        if cumulative_emissions + dispatch["total_emissions_tons"] > daily_emissions_limit_tons:
+            logger.info(f"  Hour {hour}: Emissions constraint binding, adjusting dispatch")
         cumulative_emissions += dispatch["total_emissions_tons"]
         total_cost += dispatch["total_cost"]
         schedule.append(
@@ -398,8 +371,7 @@ def dispatch_with_emissions_constraint(
                 "dispatch": dispatch,
                 "hour_emissions": dispatch["total_emissions_tons"],
                 "cumulative_emissions": cumulative_emissions,
-                "emissions_budget_remaining": daily_emissions_limit_tons
-                - cumulative_emissions,
+                "emissions_budget_remaining": daily_emissions_limit_tons - cumulative_emissions,
             }
         )
     return {
@@ -407,9 +379,7 @@ def dispatch_with_emissions_constraint(
         "total_cost": total_cost,
         "total_emissions": cumulative_emissions,
         "emissions_limit": daily_emissions_limit_tons,
-        "emissions_utilization_pct": cumulative_emissions
-        / daily_emissions_limit_tons
-        * 100,
+        "emissions_utilization_pct": cumulative_emissions / daily_emissions_limit_tons * 100,
     }
 
 
@@ -418,11 +388,6 @@ emissions_constrained = dispatch_with_emissions_constraint(
 )
 logger.info("\nEmissions-Constrained Dispatch:")
 logger.info(f"  Total Daily Cost: ${emissions_constrained['total_cost']:,.2f}")
-logger.info(
-    f"  Total Emissions: {emissions_constrained['total_emissions']:.0f} tons CO2"
-)
-logger.info(
-    f"  Emissions Limit: {emissions_constrained['emissions_limit']:.0f} tons CO2"
-)
+logger.info(f"  Total Emissions: {emissions_constrained['total_emissions']:.0f} tons CO2")
+logger.info(f"  Emissions Limit: {emissions_constrained['emissions_limit']:.0f} tons CO2")
 logger.info(f"  Utilization: {emissions_constrained['emissions_utilization_pct']:.1f}%")
-
