@@ -1,0 +1,13 @@
+[package]
+name = "power_generation_dispatch_optimization_balancing_profit_reliability_and_sustainability_bench"
+description = "Standalone Rust benchmark (no Python)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "bench"
+path = "src/main.rs"
+
+[dependencies]
+power_generation_dispatch_optimization_balancing_profit_reliability_and_sustainability_core = { path = "../core" }

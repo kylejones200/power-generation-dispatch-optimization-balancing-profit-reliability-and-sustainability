@@ -1,0 +1,9 @@
+[package]
+name = "power_generation_dispatch_optimization_balancing_profit_reliability_and_sustainability_core"
+description = "Merit-order economic dispatch total cost"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"

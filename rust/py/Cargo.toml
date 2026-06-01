@@ -1,0 +1,15 @@
+[package]
+name = "power_generation_dispatch_optimization_balancing_profit_reliability_and_sustainability_rs"
+description = "Python bindings (PyO3) for power_generation_dispatch_optimization_balancing_profit_reliability_and_sustainability_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "power_generation_dispatch_optimization_balancing_profit_reliability_and_sustainability_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+power_generation_dispatch_optimization_balancing_profit_reliability_and_sustainability_core = { path = "../core" }
+pyo3 = { version = "0.28", features = ["extension-module"] }
+numpy = "0.28"
